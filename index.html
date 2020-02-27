@@ -48,7 +48,7 @@
                 var feel_temp = document.querySelector('.feel_temp');
                 var wind = document.querySelector('.wind');
 
-                fetch('http://api.openweathermap.org/data/2.5/forecast?lat=' + sessionStorage.getItem("latitude") + '&lon=' + sessionStorage.getItem("longitude") + '&appid=ade4e15903e2a2ac7411e4fd5c1dfef9&units=metric')
+                fetch('https://api.openweathermap.org/data/2.5/forecast?lat=' + sessionStorage.getItem("latitude") + '&lon=' + sessionStorage.getItem("longitude") + '&appid=ade4e15903e2a2ac7411e4fd5c1dfef9&units=metric')
                     .then(response => response.json())
                     .then(data => {
                         var dateValue = data["list"][0]["dt_txt"];
@@ -62,7 +62,7 @@
                         var imgcode = data["list"][0]["weather"][0]["icon"];
 
                         var d = new Date(dateValue);
-                        date.innerHTML = "Datum: " + d.getDay() + "." + d.getMonth() + "." + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+                        date.innerHTML = "Datum: " + d.getDate() + "." + Number(d.getMonth()+1) + "." + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getUTCMinutes()).slice(-2);
                         name.innerHTML = "Ort: " + nameValue + ", " + countryValue;
                         main.innerHTML = "Wetter: " + mainValue;
                         desc.innerHTML = "Wetter-Beschreibung: " + descValue;
