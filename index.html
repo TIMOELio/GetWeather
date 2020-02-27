@@ -1,66 +1,79 @@
-<body onload="getLocation()">
-    <meta charset="utf-8">
-    <h1>Wetter</h1>
-    <div class="display">
-        <p class="date"></p>
-        <p class="name"></p>
-        <p class="main"></p>
-        <p class="desc"></p>
-        <p class="feel_temp"></p>
-        <p class="temp"></p>
-        <p class="wind"></p>
-        <img id="img" src="http://openweathermap.org/img/wn/02@2x.png">
-    </div>
-    <script>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>getWeather</title>
+        <meta charset="utf-8">
+    </head>
+    <body onload="getLocation()">
+        <meta charset="utf-8">
+        <h1>Wetter</h1>
+        <div class="display">
+            <p class="date"></p>
+            <p class="name"></p>
+            <p class="main"></p>
+            <p class="desc"></p>
+            <p class="feel_temp"></p>
+            <p class="temp"></p>
+            <p class="wind"></p>
+            <img id="img" src="http://openweathermap.org/img/wn/02@2x.png">
+        </div>
+        <script>
 
-        var latitude = 0;
-        var longitude = 0;
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(setWeather);
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
+            function getLocation() {
+                if(sessionStorage.getItem("latitude") == undefined) {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(setPosition);
+                    } else {
+                        x.innerHTML = "Geolocation is not supported by this browser.";
+                    }
+                } else {
+                    setWeather();
+                }
             }
-        }
 
-        function setWeather(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-            var date = document.querySelector('.date');
-            var name = document.querySelector('.name');
-            var desc = document.querySelector('.desc');
-            var temp = document.querySelector('.temp');
-            var main = document.querySelector('.main');
-            var feel_temp = document.querySelector('.feel_temp');
-            var wind = document.querySelector('.wind');
-
-            fetch('http://api.openweathermap.org/data/2.5/forecast?lat=' + latitude + '&lon=' + longitude + '&appid=ade4e15903e2a2ac7411e4fd5c1dfef9&units=metric')
-                .then(response => response.json())
-                .then(data => {
-                    var dateValue = data["list"][1]["dt_txt"];
-                    var nameValue = data["city"]["name"];
-                    var countryValue = data["city"]["country"];
-                    var descValue = data["list"][1]["weather"][0]["description"];
-                    var tempValue = data["list"][1]["main"]["temp"];
-                    var mainValue = data["list"][1]["weather"][0]["main"];
-                    var feel_tempValue = data["list"][1]["main"]["feels_like"];
-                    var windValue = data["list"][1]["wind"]["speed"];
-                    var imgcode = data["list"][1]["weather"][0]["icon"];
-
-                    var d = new Date(dateValue);
-                    date.innerHTML = "Datum: " + d.getDay() + "." + d.getMonth() + "." + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-                    name.innerHTML = "Ort: " + nameValue + ", " + countryValue;
-                    main.innerHTML = "Wetter: " + mainValue;
-                    desc.innerHTML = "Wetter-Beschreibung: " + descValue;
-                    feel_temp.innerHTML = "Gefühlte Temperatur (c): " + feel_tempValue;
-                    temp.innerHTML = "Temperatur (c): " + tempValue;
-                    wind.innerHTML = "Wind (km/h): " + Math.round((windValue*3.6) * 100)/100;
-                    document.getElementById("img").src = "http://openweathermap.org/img/wn/" + imgcode + "@2x.png"; 
-                    
-                })
-
+            function setPosition(position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+                sessionStorage.setItem("latitude", latitude);
+                sessionStorage.setItem("longitude", longitude);
+                setWeather();
             }
-    </script>
-</body>
+
+            function setWeather() {
+                var date = document.querySelector('.date');
+                var name = document.querySelector('.name');
+                var desc = document.querySelector('.desc');
+                var temp = document.querySelector('.temp');
+                var main = document.querySelector('.main');
+                var feel_temp = document.querySelector('.feel_temp');
+                var wind = document.querySelector('.wind');
+
+                fetch('http://api.openweathermap.org/data/2.5/forecast?lat=' + sessionStorage.getItem("latitude") + '&lon=' + sessionStorage.getItem("longitude") + '&appid=ade4e15903e2a2ac7411e4fd5c1dfef9&units=metric')
+                    .then(response => response.json())
+                    .then(data => {
+                        var dateValue = data["list"][0]["dt_txt"];
+                        var nameValue = data["city"]["name"];
+                        var countryValue = data["city"]["country"];
+                        var descValue = data["list"][0]["weather"][0]["description"];
+                        var tempValue = data["list"][0]["main"]["temp"];
+                        var mainValue = data["list"][0]["weather"][0]["main"];
+                        var feel_tempValue = data["list"][0]["main"]["feels_like"];
+                        var windValue = data["list"][0]["wind"]["speed"];
+                        var imgcode = data["list"][0]["weather"][0]["icon"];
+
+                        var d = new Date(dateValue);
+                        date.innerHTML = "Datum: " + d.getDay() + "." + d.getMonth() + "." + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+                        name.innerHTML = "Ort: " + nameValue + ", " + countryValue;
+                        main.innerHTML = "Wetter: " + mainValue;
+                        desc.innerHTML = "Wetter-Beschreibung: " + descValue;
+                        feel_temp.innerHTML = "Gefühlte Temperatur (c): " + feel_tempValue;
+                        temp.innerHTML = "Temperatur (c): " + tempValue;
+                        wind.innerHTML = "Wind (km/h): " + Math.round((windValue*3.6) * 100)/100;
+                        document.getElementById("img").src = "http://openweathermap.org/img/wn/" + imgcode + "@2x.png"; 
+                        
+                    })
+
+                }
+        </script>
+    </body>
+</html>
